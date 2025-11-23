@@ -1,0 +1,23 @@
+# Utilisation de l'image officielle Python 3.11 comme base
+FROM python:3.11-slim
+
+# Définition de la variable d'environnement pour l'API (assumant que l'API écoute sur ce port)
+ENV PORT 8000
+EXPOSE ${PORT}
+
+# Définition du répertoire de travail à l'intérieur du conteneur
+WORKDIR /app
+
+# Copie des dépendances et installation (cette étape est mise en cache si les dépendances ne changent pas)
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copie de tout le code de l'application
+# Assurez-vous que le Dockerfile se trouve à la racine du dossier backend/
+COPY backend/ .
+
+# Commande de démarrage du serveur Uvicorn
+# 'main' est le nom de votre fichier Python principal (main.py ou main.py/etc)
+# 'app' est l'objet FastAPI dans ce fichier
+# --host 0.0.0.0 est nécessaire pour que l'API soit accessible en dehors du conteneur
+CMD ["uvicorn", "main:app"]
